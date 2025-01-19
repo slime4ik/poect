@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добро пожаловать</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Georgia', serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            color: #fff;
+            background-image: url('https://i.imgur.com/5WaF9R1.png'); /* Винтажная текстура */
+            background-size: cover;
+            background-attachment: fixed;
+            cursor: none; /* Отключаем стандартный курсор */
+        }
+
+        .main-container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            width: 400px;
+            animation: fadeIn 1.5s ease-out;
+            border: 2px solid #fff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #000;
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .corner-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background: none;
+            border: 2px solid #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .corner-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        /* Эффект курсора */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.5;
+            pointer-events: none;
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 0.5; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.5); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка перехода к общей беседе -->
+    <button class="corner-btn" id="groupChatBtn">Общая беседа</button>
+
+    <div class="main-container">
+        <h1>Добро пожаловать!</h1>
+        <div class="button-group">
+            <button class="action-btn" id="aemBtn">АЭМ</button>
+            <button class="action-btn" id="page2Btn">ЭОВС</button>
+            <button class="action-btn" id="page3Btn">СЭВС</button>
+        </div>
+    </div>
+
+    <!-- Курсор -->
+    <div class="cursor" id="cursor"></div>
+
+    <script>
+        // Навигация
+        const aemBtn = document.getElementById('aemBtn');
+        const page2Btn = document.getElementById('page2Btn');
+        const page3Btn = document.getElementById('page3Btn');
+        const groupChatBtn = document.getElementById('groupChatBtn');
+
+        aemBtn.addEventListener('click', () => window.location.href = '/a');
+        page2Btn.addEventListener('click', () => window.location.href = '/e');
+        page3Btn.addEventListener('click', () => window.location.href = '/s');
+        groupChatBtn.addEventListener('click', () => window.location.href = '/chat');
+
+        // Курсор
+        const cursor = document.getElementById('cursor');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = `${e.clientX}px`;
+            trail.style.top = `${e.clientY}px`;
+            document.body.appendChild(trail);
+
+            setTimeout(() => trail.remove(), 1000);
+        });
+    </script>
+</body>
+</html>
