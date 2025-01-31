@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+{% load static %}
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Авторизация</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: {% if user.is_authenticated %}
+                linear-gradient(45deg, #ff9a9e, #fad0c4);
+            {% else %}
+                linear-gradient(45deg, #ff6f61, #d9534f);
+            {% endif %}
+            color: #444;
+            transition: background 0.5s ease-in-out;
+        }
+
+        h3, h4 {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            animation: fadeIn 1s;
+        }
+
+        .alert-dismissible .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: inherit;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #ff6f61;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            background: #ff4b47;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #logout-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes snow {
+            from {transform: translateY(-10px); opacity: 0;}
+            to {transform: translateY(10px); opacity: 1;}
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        #greeting {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <a href="/signout" id="logout-btn">
+            <button type="submit">Выйти</button>
+        </a>
+        <div id="message-container"></div>
+        <h3 id="greeting">Здарова емае</h3>
+        <h3>Здарова {{ user }}</h3>
+        <h4>Ты вошел успешно)</h4>
+        <a href="/a/">
+            <button>Перейти на другую страницу</button>
+        </a>
+    {% else %}
+        <h3>Ты не вошел в аккаунт</h3>
+        <a href="/">
+            <button>Войти</button>
+        </a>
+    {% endif %}
+    <script>
+        {% if user.is_authenticated %}
+        const container = document.getElementById("message-container");
+
+        const messages = [
+            {text: "Вы успешно авторизовались!", type: "success"},
+        ];
+
+        messages.forEach((msg, index) => {
+            setTimeout(() => {
+                const div = document.createElement("div");
+                div.className = `alert alert-${msg.type} alert-dismissible fade snow`;
+                div.innerHTML =
+                    `<strong>${msg.type === 'success' ? 'Успех:' : 'Ошибка:'}</strong> ${msg.text}
+                    <button class="close" aria-label="close" onclick="this.parentElement.remove()">&times;</button>`;
+                container.appendChild(div);
+            }, index * 2000);
+        });
+
+        const greetings = ["Привет, как дела?", "Как настроение?", "Добро пожаловать!"];
+        let i = 0;
+        setInterval(() => {
+            document.getElementById("greeting").textContent = greetings[i % greetings.length];
+            i++;
+        }, 3000);
+        {% endif %}
+    </script>
+</body>
+</html>

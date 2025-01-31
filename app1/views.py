@@ -1,17 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
-from .models import Post, Poste, Postw, AccessKey
-from .forms import PosteForm, PostForm, PostwForm, AccessKeyForm
+from .models import Post, Poste, Postw, People, News
+from .forms import PosteForm, PostForm, PostwForm, PeopleForm
 from .forms import AccessKeyForm
 from django.conf import settings
 from django.urls import reverse
 from django.http import JsonResponse
+from django.contrib import messages
+from django.contrib.auth import user_logged_in, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @login_required
 def index_page(request):
-    return render(request, 'home.html')
+    news_list = News.objects.order_by('-id')  # или ваш запрос для получения списка новостей
+    return render(request, 'home.html', {'news_list': news_list})
 
 @login_required
 def a_page(request):
@@ -21,65 +24,43 @@ def a_page(request):
 #СОЗДАНИЕ ПОСТА В АЭМ
 @login_required
 def create(request):
-    error=''
+    error = ''
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
-            form.save()  # Сохраняем данные в БД
-            return redirect('/a')
+            # Создаем объект поста без сохранения в БД
+            post = form.save(commit=False)
+            post.user = request.user  # Присваиваем текущего пользователя
+            post.save()  # Сохраняем пост в БД
+            return redirect('/a/')  # Перенаправляем после сохранения
+        else:
+            error = 'Ты бл заполни нормально ее дебил'
     else:
-        error = 'ты бл заполни нормально ее дебил'
+        form = PostForm()  # Пустая форма для первого загрузки страницы
 
     # Получение всех записей из базы данных
     posts = Post.objects.all()
-    form = PostForm()
 
-    context ={
+    context = {
         'form': form,
-        'error': error
+        'error': error,
+        'posts': posts  # Добавляем посты в контекст для отображения
     }
     return render(request, 'create.html', context)
 
-@login_required
-def post_page(request):
-    # Обработка формы
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)  # Обработка данных формы и файлов
-        if form.is_valid():
-            form.save()  # Сохраняем данные в БД
 
-    else:
-        form = PostForm()  # Пустая форма для GET-запроса
 
-    # Получение всех записей из базы данных
-    posts = Post.objects.all()
 
-    # Передача формы и списка записей в шаблон
-    return render(request, 'post_page.html', {'form': form, 'posts': posts})
 
-@login_required
-def chat_page(request):
-    return render(request, 'chat.html')
 
-@login_required
-def posts_view(request):
+'''def posts_view(request):
     posts = Post.objects.select_related('user').all()
-    return render(request, 'posts.html', {'Posts': posts})
-
-
-# app1/views.py
-
-from django.shortcuts import render, redirect
-from .forms import AccessKeyForm
-from .models import AccessKey
-from django.http import HttpResponseForbidden
-
-
-
+    return render(request, 'posts.html', {'Posts': posts})'''
 
 @login_required
+# app1/views.py
 def e_page(request):
-    postes = Poste.objects.all()
+    postes = Poste.objects.order_by('-id')
     return render(request, 'e.html', {'title': '', 'Postes' : postes })
 
 @login_required
@@ -88,8 +69,10 @@ def createe(request):
     if request.method == 'POST':
         form = PosteForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
-            form.save()  # Сохраняем данные в БД
-            return redirect('/e')
+            post = form.save(commit=False)
+            post.user = request.user  # Присваиваем текущего пользователя
+            post.save()  # Сохраняем пост в БД
+            return redirect('/e/')
     else:
         error = 'ты бл заполни нормально ее дебил'
 
@@ -105,7 +88,7 @@ def createe(request):
 
 @login_required
 def s_page(request):
-    postws = Postw.objects.all()
+    postws = Postw.objects.order_by('-id')
     return render(request, 's.html', {'title': '', 'Postws' : postws })
 @login_required
 def createw(request):
@@ -113,12 +96,15 @@ def createw(request):
     if request.method == 'POST':
         form = PostwForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
-            form.save()  # Сохраняем данные в БД
-            return redirect('/s')
+            post = form.save(commit=False)
+            post.user = request.user  # Присваиваем текущего пользователя
+            post.save()  # Сохраняем пост в БД
+            return redirect('/s/')
     else:
         error = 'ты бл заполни нормально ее дебил'
 
     # Получение всех записей из базы данных
+
     Postws = Postw.objects.all()
     form = PostwForm()
 
@@ -128,41 +114,34 @@ def createw(request):
     }
     return render(request, 'creates.html', context)
 
+def signin(request):
+    # Если пользователь уже авторизован, перенаправляем на /home/
+    if request.user.is_authenticated:
+        return redirect("index_page")
 
-from django.http import JsonResponse
-from django.shortcuts import render
-
-def access_view(request):
     if request.method == "POST":
-        form = AccessKeyForm(request.POST)
-        if form.is_valid():
-            access_key = form.cleaned_data['access_key']
-            try:
-                key_entry = AccessKey.objects.get(key=access_key, used=False)
-                key_entry.used = True
-                key_entry.save()
-                request.session['user_name'] = key_entry.assigned_name
-                return JsonResponse({
-                    'success': True,
-                    'redirect_url': 'protected',  # URL куда перекидывать
-                })
-            except AccessKey.DoesNotExist:
-                return JsonResponse({
-                    'success': False,
-                    'error_message': 'Invalid or already used key'
-                })
-    else:
-        form = AccessKeyForm()
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
 
-    return render(request, 'access_form.html', {'form': form})
+        if user is not None:
+            # Авторизация пользователя
+            login(request, user)
+            # Перенаправление на главную страницу
+            return redirect("index_page")
+        else:
+            # Если аутентификация не удалась
+            messages.error(request, 'Чото ты не правильно ввел -_-')
+            return redirect('signin')
+
+    # Если метод не POST, отображаем форму входа
+    return render(request, 'loging/signin.html')
+
+def signout(request):
+    logout(request)
+    messages.success(request, "Вышли успешно)")
+    return redirect('signin')
 
 
-def protected_page(request):
-    # Проверка наличия имени в сессии
-    user_name = request.session.get('user_name')
 
-    if not user_name:
-        return HttpResponseForbidden("Access denied")
-
-    return render(request, 'protected_page.html', {'user_name': user_name})
 

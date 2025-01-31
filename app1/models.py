@@ -3,11 +3,16 @@ from django.contrib.auth.models import User
 import os
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.contrib.auth.models import User
+
 class Post(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(blank=False, max_length=100)
-    text  = models.TextField(blank=False)
+    name = models.CharField(blank=True, max_length=100)
+    text  = models.TextField(blank=True)
     image = models.ImageField(upload_to='images', blank=True, null=True)  # 'images/' — папка, куда будут загружаться изображения
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return self.name
@@ -29,6 +34,9 @@ class Poste(models.Model):
     name = models.CharField(blank=False, max_length=100)
     text  = models.TextField(blank=False)
     image = models.ImageField(upload_to='imagese', blank=True, null=True)  # 'images/' — папка, куда будут загружаться изображения
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return self.name
@@ -48,9 +56,12 @@ def delete_image_on_post_delete(sender, instance, **kwargs):
 
 class Postw(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(blank=False, max_length=100)
-    text  = models.TextField(blank=False)
+    name = models.CharField(blank=True, max_length=100)
+    text  = models.TextField(blank=True)
     image = models.ImageField(upload_to='imagess', blank=True, null=True)  # 'images/' — папка, куда будут загружаться изображения
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return self.name
@@ -67,10 +78,35 @@ def delete_image_on_post_delete(sender, instance, **kwargs):
         if os.path.isfile(instance.image.path):  # Проверка существования файла
             os.remove(instance.image.path)  # Удаление файла
 
-class AccessKey(models.Model):
-    key = models.CharField(max_length=50, unique=True)  # Уникальный код
-    assigned_name = models.CharField(max_length=100, default=False)  # Имя, связанное с кодом
-    used = models.BooleanField(default=False)  # Отметка, использован ли ключ
+class People(models.Model):
+    # Уникальный пароль (ключ)
+    password = models.CharField(blank=False, max_length=4, unique=True)
+    # Имя пользователя
+    name = models.CharField(blank=False, max_length=50, unique=True)
+    # Флаг, указывающий, был ли ключ уже использован
+    used = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.key} - {self.assigned_name} ({'Used' if self.used else 'Unused'})"
+        return f"{self.name} - {self.password}"
+
+class News(models.Model):
+    name = models.CharField(blank=True, max_length=100)
+    text  = models.TextField(blank=True)
+    image = models.ImageField(upload_to='news', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        verbose_name = 'Новости'
+        verbose_name_plural = 'Новости'
+
+@receiver(post_delete, sender=News)
+def delete_image(sender, instance, **kwargs):
+    # Проверяем, если у объекта есть изображение
+    if instance.image:
+        # Формируем путь к изображению
+        image_path = instance.image.path
+        # Проверяем, существует ли файл на диске, и удаляем его
+        if os.path.isfile(image_path):
+            os.remove(image_path)

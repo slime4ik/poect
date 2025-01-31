@@ -1,6 +1,8 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добро пожаловать</title>
@@ -13,14 +15,49 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #000;
+            background: linear-gradient(to right, #ff7e5f, #feb47b); /* Градиент от розового к оранжевому */
             color: #fff;
-            background-image: url('https://i.imgur.com/5WaF9R1.png'); /* Винтажная текстура */
-            background-size: cover;
-            background-attachment: fixed;
-            cursor: none; /* Отключаем стандартный курсор */
+            cursor: default; /* Возвращаем стандартный курсор */
+        }
+                /* Кнопка Выйти */
+        #logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 20px 40px;
+            background: linear-gradient(145deg, #ff5f6d, #ffc3a0);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), -4px -4px 10px rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease-in-out;
+            z-index: 100;
         }
 
+        #logout-btn:hover {
+            background: linear-gradient(145deg, #ffc3a0, #ff5f6d);
+            transform: scale(1.05);
+            box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.2), -6px -6px 15px rgba(255, 255, 255, 0.7);
+        }
+
+        #logout-btn:active {
+            transform: scale(1);
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #logout-btn button {
+            all: unset;
+            padding: 0;
+            margin: 0;
+            color: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            cursor: inherit;
+        }
         .main-container {
             text-align: center;
             padding: 40px;
@@ -31,26 +68,61 @@
             animation: fadeIn 1.5s ease-out;
             border: 2px solid #fff;
         }
-
+        .news-feed {
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: none; /* Изначально скрыто */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .news-feed.show {
+            display: block;
+            opacity: 1;
+        }
+        .news-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            transition: transform 0.2s ease;
+        }
+        .news-item:hover {
+            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .news-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .news-item .news-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f9c74f;
+            margin-bottom: 10px;
+        }
+        .news-item .news-text {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            text-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
-            font-weight: bold;
-        }
-
         .button-group {
             display: flex;
             justify-content: space-between;
             gap: 10px;
         }
-
         .action-btn {
             flex: 1;
             padding: 15px;
@@ -65,107 +137,145 @@
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
             transition: transform 0.3s, box-shadow 0.3s;
         }
-
         .action-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
         }
-
-        .corner-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .toggle-btn {
+            margin-top: 20px;
             padding: 10px 20px;
             font-size: 1rem;
-            color: #fff;
-            background: none;
-            border: 2px solid #fff;
+            background: #f9c74f;
+            border: 2px solid #f9c74f;
             border-radius: 20px;
             cursor: pointer;
-            text-transform: uppercase;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .corner-btn:hover {
-            background: #fff;
             color: #000;
+            text-transform: uppercase;
+        }
+        .toggle-btn:hover {
+            background: #f9c74f;
             transform: scale(1.1);
         }
-
-        /* Эффект курсора */
-        .cursor {
+        /* Стиль для увеличенного изображения */
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            pointer-events: none;
-            mix-blend-mode: difference;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
-
-        .cursor-trail {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0.5;
-            pointer-events: none;
-            animation: fadeOut 1s forwards;
+        .overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
         }
-
-        @keyframes fadeOut {
-            from { opacity: 0.5; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.5); }
+        /* Стиль для кнопки "Выйти" */
+        #logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background-color: #f9c74f;
+            color: #000;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
+        #logout-btn:hover {
+            transform: scale(1.1);
+            background-color: #f9a54f;
+        }
+        .news-date {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+.news-item {
+    position: relative; /* Нужно, чтобы дата позиционировалась внутри */
+}
     </style>
 </head>
 <body>
-    <!-- Кнопка перехода к общей беседе -->
-    <button class="corner-btn" id="groupChatBtn">Общая беседа</button>
-
     <div class="main-container">
-        <h1>Добро пожаловать!</h1>
+        <h1>Ну здарова {{ user }} &#128540</h1>
         <div class="button-group">
-            <button class="action-btn" id="aemBtn">АЭМ</button>
-            <button class="action-btn" id="page2Btn">ЭОВС</button>
-            <button class="action-btn" id="page3Btn">СЭВС</button>
+            <button class="action-btn" id="aemBtn" onclick="window.location.href='/a/'">АЭМ</button>
+            <button class="action-btn" id="page2Btn" onclick="window.location.href='/e/'">ЭОВС</button>
+            <button class="action-btn" id="page3Btn" onclick="window.location.href='/s/'">СЭВС</button>
+        </div>
+    <a href="/signout/" id="logout-btn">
+        <button type="submit">Выйти</button>
+    </a>
+        <!-- Кнопка для открытия/закрытия новостей -->
+        <button class="toggle-btn" id="toggleNewsBtn">Чекнуть новости</button>
+        <div class="news-feed" id="newsFeed">
+            <h3>Новости(с вопросами к админу)</h3>
+            {% for news in news_list %}
+    <div class="news-item">
+        <span class="news-date">{{ news.created_at|date:"d.m.Y H:i" }}</span> <!-- Дата в правом верхнем углу -->
+        <h3>{{ news.name }}</h3>
+        <p>{{ news.text|linebreaksbr|urlize }}</p>
+        {% if news.image %}
+            <img src="{{ news.image.url }}" alt="News Image" class="thumbnail" data-full-image="{{ news.image.url }}">
+        {% endif %}
+    </div>
+{% empty %}
+    Новостей пока нет &#128540
+{% endfor %}
         </div>
     </div>
 
-    <!-- Курсор -->
-    <div class="cursor" id="cursor"></div>
+    <!-- Оверлей для увеличенного изображения -->
+    <div class="overlay" id="imageOverlay" onclick="closeImage()">
+        <img id="overlayImage" src="" alt="Full Image">
+    </div>
+
+    <!-- Кнопка "Выйти" -->
 
     <script>
-        // Навигация
-        const aemBtn = document.getElementById('aemBtn');
-        const page2Btn = document.getElementById('page2Btn');
-        const page3Btn = document.getElementById('page3Btn');
-        const groupChatBtn = document.getElementById('groupChatBtn');
+        // Функция для переключения видимости новостей
+        const toggleNewsBtn = document.getElementById('toggleNewsBtn');
+        const newsFeed = document.getElementById('newsFeed');
 
-        aemBtn.addEventListener('click', () => window.location.href = '/a');
-        page2Btn.addEventListener('click', () => window.location.href = '/e');
-        page3Btn.addEventListener('click', () => window.location.href = '/s');
-        groupChatBtn.addEventListener('click', () => window.location.href = '/chat');
-
-        // Курсор
-        const cursor = document.getElementById('cursor');
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-
-            const trail = document.createElement('div');
-            trail.className = 'cursor-trail';
-            trail.style.left = `${e.clientX}px`;
-            trail.style.top = `${e.clientY}px`;
-            document.body.appendChild(trail);
-
-            setTimeout(() => trail.remove(), 1000);
+        toggleNewsBtn.addEventListener('click', () => {
+            newsFeed.classList.toggle('show');
+            if (newsFeed.classList.contains('show')) {
+                toggleNewsBtn.textContent = 'Перестать чекать новости';
+            } else {
+                toggleNewsBtn.textContent = 'Чекать новости';
+            }
         });
+
+        // Открытие изображения на весь экран
+        const images = document.querySelectorAll('.news-item img');
+        const overlay = document.getElementById('imageOverlay');
+        const overlayImage = document.getElementById('overlayImage');
+
+        images.forEach(image => {
+            image.addEventListener('click', () => {
+                const fullImageUrl = image.getAttribute('data-full-image');
+                overlay.style.display = 'flex';
+                overlayImage.src = fullImageUrl;
+            });
+        });
+
+        // Закрытие увеличенного изображения
+        function closeImage() {
+            overlay.style.display = 'none';
+        }
     </script>
 </body>
 </html>

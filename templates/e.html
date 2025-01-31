@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+{% load static %}
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ title }}{% endblock %}</title>
@@ -14,7 +16,7 @@
             margin: 0;
             padding: 0;
             color: #e0e0e0;
-            overflow-x: hidden; /* Скрыть горизонтальный скролл */
+            overflow-x: hidden;
         }
 
         @keyframes gradientAnimation {
@@ -29,6 +31,24 @@
             color: #f0f0f0;
             text-align: center;
             font-size: 1.8rem;
+        }
+
+        /* Поле поиска */
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #search-input {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            background-color: #222;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
         }
 
         /* Кнопки сверху */
@@ -89,23 +109,36 @@
             text-align: left;
         }
 
-        .post .username {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #1e90ff;
-        }
-
-        .post .timestamp {
-            font-size: 0.85rem;
-            color: #aaa;
-            margin-left: 5px;
+        /* Новый стиль для поста */
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         .post .title {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 5px;
             color: #f0f0f0;
+        }
+
+        .post .author-date {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .post .username {
+            font-size: 0.9rem;
+            color: #1e90ff;
+            font-weight: normal;
+        }
+
+        .post .timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
         }
 
         .post .content {
@@ -135,29 +168,58 @@
             border-radius: 5px;
             box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
         }
+        .scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #444, #222);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, transform 0.2s, opacity 0.3s;
+    opacity: 0.7;
+}
+
+.scroll-to-top:hover {
+    background: linear-gradient(135deg, #666, #444);
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.scroll-to-top:active {
+    transform: scale(1);
+}
     </style>
 </head>
 <body>
     {% block content %}
-    <!-- Кнопки сверху -->
     <div class="top-buttons">
-        <a href="/home" class="navigate-button" data-direction="right">На главную</a>
-        <a href="/createe" class="navigate-button" data-direction="left">Добавить пост</a>
+        <a href="/" class="navigate-button">На главную</a>
+        <a href="/createe/" class="navigate-button">Добавить пост</a>
     </div>
 
-    <!-- Заголовок -->
     <h1>Доска сообщений</h1>
 
-    <!-- Список постов -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Поиск по названию...">
+    </div>
+
     {% for el in Postes %}
-        <div class="post">
+        <div class="post" data-title="{{ el.name|lower }}">
             <div class="post-content">
-                <div>
-                    <span class="username">{{ el.user.username }}</span>
-                    <span class="timestamp">{{ el.timestamp }}</span>
+                <div class="post-header">
+                    <div class="title">{{ el.name }}</div>
+                    <div class="author-date">
+                        <div class="username">{{ el.user.username|lower }}</div>
+                        <div class="timestamp">{{ el.created_at|date:"d M Y, H:i" }}</div>
+                    </div>
                 </div>
-                <div class="title">{{ el.name }}</div>
-                <div class="content">{{ el.text|linebreaksbr }}</div>
+                <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
             </div>
             {% if el.image %}
                 <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" data-full-image="{{ el.image.url }}">
@@ -165,58 +227,31 @@
         </div>
     {% endfor %}
     {% endblock %}
-
-    <!-- Модальное окно -->
+<a href="javascript:scroll(0,0)">
+    <button class="scroll-to-top">В начало</button>
+</a>
     <div id="image-modal">
         <img id="modal-image" src="" alt="Full Image">
     </div>
 
     <script>
-        const buttons = document.querySelectorAll('.navigate-button');
-        const body = document.body;
-
-        buttons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = button.getAttribute('href');
-                const direction = button.getAttribute('data-direction');
-
-                // Добавляем анимацию слайда в зависимости от направления
-                if (direction === "left") {
-                    body.classList.add('slide-out-left');
-                } else if (direction === "right") {
-                    body.classList.add('slide-out-right');
-                }
-
-                // Переход на новую страницу после завершения анимации
-                setTimeout(() => {
-                    window.location.href = target;
-                }, 800);
+        document.getElementById('search-input').addEventListener('input', function () {
+            let searchValue = this.value.toLowerCase();
+            document.querySelectorAll('.post').forEach(post => {
+                let title = post.getAttribute('data-title');
+                post.style.display = title.includes(searchValue) ? 'flex' : 'none';
             });
         });
 
-        // Проверка навигации назад
-        window.addEventListener('popstate', () => {
-            body.classList.add('slide-in-left');
-        });
-
-        // Модальное окно
-        const modal = document.getElementById('image-modal');
-        const modalImage = document.getElementById('modal-image');
-
-        // Открытие модального окна при клике на изображение
         document.querySelectorAll('.thumbnail').forEach(img => {
             img.addEventListener('click', (e) => {
-                e.preventDefault();
-                modal.style.display = 'flex';
-                modalImage.src = img.getAttribute('data-full-image');
+                document.getElementById('image-modal').style.display = 'flex';
+                document.getElementById('modal-image').src = img.getAttribute('data-full-image');
             });
         });
 
-        // Закрытие модального окна при клике на него
-        modal.addEventListener('click', () => {
-            modal.style.display = 'none';
-            modalImage.src = '';
+        document.getElementById('image-modal').addEventListener('click', () => {
+            document.getElementById('image-modal').style.display = 'none';
         });
     </script>
 </body>
