@@ -194,6 +194,21 @@
 .scroll-to-top:active {
     transform: scale(1);
 }
+        .post img {
+            width: 150px;
+            height: auto;
+            margin-left: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease, width 0.2s ease;
+        }
+    
+        .post img.fullsize {
+            width: auto;
+            max-width: 90vw;
+            max-height: 90vh;
+            transform: scale(1);
+        }  
     </style>
 </head>
 <body>
@@ -210,22 +225,23 @@
     </div>
 
     {% for el in Postws %}
-        <div class="post" data-title="{{ el.name|lower }}">
-            <div class="post-content">
-                <div class="post-header">
-                    <div class="title">{{ el.name }}</div>
-                    <div class="author-date">
-                        <div class="username">{{ el.user.username|lower }}</div>
-                        <div class="timestamp">{{ el.created_at|date:"d M Y, H:i" }}</div>
-                    </div>
+    <div class="post" data-title="{{ el.name|lower }}">
+        <div class="post-content">
+            <div class="post-header">
+                <div class="title">{{ el.name }}</div>
+                <div class="author-date">
+                    <div class="username">{{ el.user.username|lower }}</div>
+                    <div class="timestamp">{{ el.created_at|date:"d M Y, H:i" }}</div>
                 </div>
-                <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
             </div>
-            {% if el.image %}
-                <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" data-full-image="{{ el.image.url }}">
+            <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
+        </div>
+        {% if el.image %}
+            <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" onclick="toggleImageSize(this)">
             {% endif %}
         </div>
     {% endfor %}
+    {% include "pagination.html" with page=Postws %}
     {% endblock %}
 
     <div id="image-modal">
@@ -242,17 +258,10 @@
                 post.style.display = title.includes(searchValue) ? 'flex' : 'none';
             });
         });
+        function toggleImageSize(img) {
+            img.classList.toggle('fullsize');
+        }
 
-        document.querySelectorAll('.thumbnail').forEach(img => {
-            img.addEventListener('click', (e) => {
-                document.getElementById('image-modal').style.display = 'flex';
-                document.getElementById('modal-image').src = img.getAttribute('data-full-image');
-            });
-        });
-
-        document.getElementById('image-modal').addEventListener('click', () => {
-            document.getElementById('image-modal').style.display = 'none';
-        });
     </script>
 </body>
 </html>

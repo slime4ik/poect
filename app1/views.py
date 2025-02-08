@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import user_logged_in, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 
 @login_required
@@ -18,8 +19,18 @@ def index_page(request):
 
 @login_required
 def a_page(request):
-    posts = Post.objects.order_by('-id')
-    return render(request, 'a.html', {'title': '', 'Posts' : posts })
+    posts = Post.objects.order_by('-id')  # Получаем QuerySet с записями
+    paginator = Paginator(posts, 15)  # Передаем QuerySet в Paginator
+    page_number = request.GET.get('page', 1)
+    try:
+        posts = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page_number is not an integer deliver the first page
+        posts = paginator.page(1)
+    except EmptyPage:
+        # If page_number is out of range deliver last page of results
+        posts = paginator.page(paginator.num_pages)
+    return render(request, 'a.html', {'title': '', 'Posts': posts})
 
 #СОЗДАНИЕ ПОСТА В АЭМ
 @login_required
@@ -61,6 +72,16 @@ def create(request):
 # app1/views.py
 def e_page(request):
     postes = Poste.objects.order_by('-id')
+    paginator = Paginator(postes, 15)  # Передаем QuerySet в Paginator
+    page_number = request.GET.get('page', 1)
+    try:
+        postes = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page_number is not an integer deliver the first page
+        postes = paginator.page(1)
+    except EmptyPage:
+        # If page_number is out of range deliver last page of results
+        postes = paginator.page(paginator.num_pages)
     return render(request, 'e.html', {'title': '', 'Postes' : postes })
 
 @login_required
@@ -89,6 +110,16 @@ def createe(request):
 @login_required
 def s_page(request):
     postws = Postw.objects.order_by('-id')
+    paginator = Paginator(postws, 15)  # Передаем QuerySet в Paginator
+    page_number = request.GET.get('page', 1)
+    try:
+        postws = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page_number is not an integer deliver the first page
+        postws = paginator.page(1)
+    except EmptyPage:
+        # If page_number is out of range deliver last page of results
+        postws = paginator.page(paginator.num_pages)
     return render(request, 's.html', {'title': '', 'Postws' : postws })
 @login_required
 def createw(request):

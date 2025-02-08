@@ -23,10 +23,12 @@ SECRET_KEY = 'django-insecure-ee)ll@a&+v4tfg0l-j9$bz3_@v37+1x*@%f4%1-3+cpa*3zlkn
 LOGIN_URL = '/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
 ALLOWED_HOSTS = ['slime4ik-poect-f407.twc1.net', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://slime4ik-poect-90e6.twc1.net', 'http://127.0.0.1:8000/']
+CSRF_TRUSTED_ORIGINS = [
+    "https://slime4ik-poect-f407.twc1.net",
+    "http://127.0.0.1:8000"
+]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -142,7 +144,7 @@ USE_TZ = True
 import os
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

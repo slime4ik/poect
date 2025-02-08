@@ -1,0 +1,155 @@
+<div class="pagination-container">
+    <div class="pagination">
+        {% if page.has_previous %}
+            <a href="?page=1" class="first-page">&laquo; Первая</a>
+            <a href="?page={{ page.previous_page_number }}" class="previous">Предыдущая</a>
+        {% else %}
+            <span class="inactive">Первая</span>
+            <span class="inactive">Предыдущая</span>
+        {% endif %}
+        
+        <!-- Ссылки на страницы -->
+        <div class="page-links">
+            {% for num in page.paginator.page_range %}
+                <a href="?page={{ num }}" class="pagination-link {% if num == page.number %}active{% endif %}">{{ num }}</a>
+            {% endfor %}
+        </div>
+
+        {% if page.has_next %}
+            <a href="?page={{ page.next_page_number }}" class="next">Следующая</a>
+            <a href="?page={{ page.paginator.num_pages }}" class="last-page">Последняя &raquo;</a>
+        {% else %}
+            <span class="inactive">Следующая</span>
+            <span class="inactive">Последняя</span>
+        {% endif %}
+    </div>
+
+    <!-- Пагинация в стиле выбора страниц -->
+    <div class="page-selector">
+        <label for="page-select" class="select-label">Перейти на страницу:</label>
+        <select id="page-select" class="page-select">
+            {% for num in page.paginator.page_range %}
+                <option value="?page={{ num }}" {% if num == page.number %}selected{% endif %}>Страница {{ num }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<style>
+    /* Основные стили для контейнера пагинации */
+    .pagination-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    /* Упрощённые кнопки */
+    .pagination a, .pagination .inactive {
+        text-decoration: none;
+        color: #bbb;
+        background-color: #333;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* Эффект при наведении */
+    .pagination a:hover {
+        background-color: #444;
+        color: #fff;
+    }
+
+    /* Активная страница */
+    .pagination .active {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Кнопки первой и последней страниц */
+    .pagination .first-page, .pagination .last-page {
+        font-weight: bold;
+    }
+
+    /* Неактивные кнопки */
+    .pagination .inactive {
+        color: #666;
+        pointer-events: none;
+    }
+
+    /* Контейнер для выбора страницы */
+    .page-selector {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .select-label {
+        color: #bbb;
+        font-size: 14px;
+    }
+
+    .page-select {
+        background-color: #333;
+        color: #bbb;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .page-select option {
+        background-color: #333;
+        color: #bbb;
+    }
+
+    /* Мобильная версия */
+    @media (max-width: 600px) {
+        .pagination-container {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .pagination a, .pagination .inactive {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .page-selector {
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .page-select {
+            width: 100%;
+        }
+    }
+
+</style>
+
+<script>
+    // Автоматически перенаправляет на выбранную страницу из селекта
+    document.querySelector('#page-select').addEventListener('change', function() {
+        window.location.href = this.value;
+    });
+</script>

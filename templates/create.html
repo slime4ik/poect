@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
 {% load static %}
@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ну создавай епта{% endblock %}</title>
     <style>
-        /* Темная тема */
         body {
             background: linear-gradient(120deg, #1e1e1e, #282828, #2c2c2c, #1a1a1a);
             background-size: 300% 300%;
@@ -19,7 +18,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            color: #eaeaea; /* Текст для темной темы */
+            color: #eaeaea;
         }
 
         h1 {
@@ -30,7 +29,7 @@
         }
 
         .form-container {
-            background: rgba(40, 40, 40, 0.9); /* Темный фон для формы */
+            background: rgba(40, 40, 40, 0.9);
             border: 2px solid #4f4f4f;
             border-radius: 15px;
             box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.5);
@@ -42,7 +41,7 @@
 
         .form-container font {
             font-size: 1.8rem;
-            color: #dcdcdc; /* Текст для заголовка формы */
+            color: #dcdcdc;
             margin-bottom: 20px;
             display: block;
         }
@@ -110,6 +109,63 @@
             background: linear-gradient(120deg, #483d8b, #6a5acd);
             transform: scale(1.1);
         }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-input-container label {
+            display: inline-block;
+            background-color: #4f4f4f;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .file-input-container label:hover {
+            background-color: #666;
+        }
+
+        .file-input-container input[type="file"] {
+            display: none;
+        }
+
+        .file-warning {
+            color: #ff4500;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Стиль для подсказки на компьютерах */
+        @media (min-width: 768px) {
+            .resize-hint {
+                display: block;
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                color: #bdb76b;
+                background: rgba(0, 0, 0, 0.6);
+                padding: 5px;
+                border-radius: 5px;
+            }
+
+            textarea {
+                resize: both;
+            }
+        }
+
+        /* Стиль для увеличенного поля на мобильных устройствах */
+        @media (max-width: 767px) {
+            textarea {
+                height: 200px; /* Увеличиваем высоту поля для мобильных устройств */
+            }
+        }
     </style>
 </head>
 <body>
@@ -120,8 +176,17 @@
             {% csrf_token %}
             <input type="text" placeholder="Название поста (до 100 символов)" name="name" maxlength="100" required>
             <textarea placeholder="Текст поста (до 9999 символов)" name="text" rows="4" maxlength="9999" required></textarea>
-            <div class="warning-message" id="warningMessage">Ты превысил лимит!Лучше разбей свой текст на 2 поста:р</div>
-            <input type="file" name="image" accept="image/*">
+            <div class="warning-message" id="warningMessage">Ты превысил лимит! Лучше разбей свой текст на 2 поста :р</div>
+
+            <!-- Контейнер для прикрепления файлов -->
+            <div class="file-input-container">
+                <label for="fileInput">
+                    <span>&#128206; Прикрепить фото/гифки</span> <!-- Иконка скрепки -->
+                </label>
+                <input type="file" id="fileInput" name="image" accept="image/*,video/*">
+                <div class="file-warning" id="fileWarning">Можно прикреплять только изображения и гифки!</div>
+            </div>
+
             <button type="submit">Запостить</button>
         </form>
 
@@ -135,6 +200,8 @@
         // Проверка на превышение лимита текста
         const textarea = document.querySelector('textarea[name="text"]');
         const warningMessage = document.getElementById('warningMessage');
+        const fileInput = document.getElementById('fileInput');
+        const fileWarning = document.getElementById('fileWarning');
 
         textarea.addEventListener('input', () => {
             if (textarea.value.length > 9998) {
@@ -143,6 +210,17 @@
             } else {
                 textarea.classList.remove('warning');
                 warningMessage.style.display = 'none';
+            }
+        });
+
+        // Проверка типа прикрепленного файла
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file && !file.type.startsWith('image') && !file.type.startsWith('gif')) {
+                fileWarning.style.display = 'block';
+                fileInput.value = '';  // Очистить файл
+            } else {
+                fileWarning.style.display = 'none';
             }
         });
     </script>

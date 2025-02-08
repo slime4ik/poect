@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-{% load static %}
+    {% load static %}
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ title }}{% endblock %}</title>
     <style>
-        /* Динамический фон */
         body {
             background: linear-gradient(135deg, #2e2e2e, #1e1e1e);
             background-size: 300% 300%;
@@ -25,7 +24,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Заголовок */
         h1 {
             margin-top: 20px;
             color: #f0f0f0;
@@ -33,7 +31,6 @@
             font-size: 1.8rem;
         }
 
-        /* Поле поиска */
         .search-container {
             text-align: center;
             margin-bottom: 20px;
@@ -51,7 +48,6 @@
             outline: none;
         }
 
-        /* Кнопки сверху */
         .top-buttons {
             text-align: center;
             margin-top: 20px;
@@ -76,7 +72,6 @@
             transform: scale(1.03);
         }
 
-        /* Посты */
         .post {
             display: flex;
             align-items: flex-start;
@@ -91,17 +86,16 @@
         }
 
         .post img {
-            max-width: 150px;
-            max-height: 150px;
+            width: 60px;
+            height: auto;
             margin-left: 15px;
             border-radius: 5px;
-            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
             cursor: pointer;
             transition: transform 0.2s ease;
         }
 
         .post img:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
         .post-content {
@@ -109,7 +103,6 @@
             text-align: left;
         }
 
-        /* Новый стиль для поста */
         .post-header {
             display: flex;
             justify-content: space-between;
@@ -147,35 +140,36 @@
             line-height: 1.4;
             color: #ccc;
         }
+
         .scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #444, #222);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, transform 0.2s, opacity 0.3s;
-    opacity: 0.7;
-}
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #444, #222);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s, transform 0.2s, opacity 0.3s;
+            opacity: 0.7;
+        }
 
-.scroll-to-top:hover {
-    background: linear-gradient(135deg, #666, #444);
-    transform: scale(1.1);
-    opacity: 1;
-}
+        .scroll-to-top:hover {
+            background: linear-gradient(135deg, #666, #444);
+            transform: scale(1.1);
+            opacity: 1;
+        }
 
-.scroll-to-top:active {
-    transform: scale(1);
-}
+        .scroll-to-top:active {
+            transform: scale(1);
+        }
 
-        /* Модальное окно */
-        #image-modal {
+        /* Стили для большого изображения */
+        .full-image {
             display: none;
             position: fixed;
             top: 0;
@@ -188,11 +182,25 @@
             z-index: 1000;
         }
 
-        #image-modal img {
+        .full-image img {
             max-width: 90%;
             max-height: 90%;
             border-radius: 5px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+        }
+        .post img {
+            width: 150px;
+            height: auto;
+            margin-left: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease, width 0.2s ease;
+        }
+    
+        .post img.fullsize {
+            width: auto;
+            max-width: 90vw;
+            max-height: 90vh;
+            transform: scale(1);
         }
     </style>
 </head>
@@ -210,29 +218,29 @@
     </div>
 
     {% for el in Posts %}
-        <div class="post" data-title="{{ el.name|lower }}">
-            <div class="post-content">
-                <div class="post-header">
-                    <div class="title">{{ el.name }}</div>
-                    <div class="author-date">
-                        <div class="username">{{ el.user.username|lower }}</div>
-                        <div class="timestamp">{{ el.created_at|date:"d M Y, H:i" }}</div>
-                    </div>
+    <div class="post" data-title="{{ el.name|lower }}">
+        <div class="post-content">
+            <div class="post-header">
+                <div class="title">{{ el.name }}</div>
+                <div class="author-date">
+                    <div class="username">{{ el.user.username|lower }}</div>
+                    <div class="timestamp">{{ el.created_at|date:"d M Y, H:i" }}</div>
                 </div>
-                <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
             </div>
-            {% if el.image %}
-                <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" data-full-image="{{ el.image.url }}">
-            {% endif %}
+            <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
         </div>
-    {% endfor %}
-    {% endblock %}
-<a href="javascript:scroll(0,0)">
-    <button class="scroll-to-top">В начало</button>
-</a>
-    <div id="image-modal">
-        <img id="modal-image" src="" alt="Full Image">
+        {% if el.image %}
+            <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" onclick="toggleImageSize(this)">
+        {% endif %}
     </div>
+{% endfor %}
+
+    {% include "pagination.html" with page=Posts %}
+    {% endblock %}
+
+    <a href="javascript:scroll(0,0)">
+        <button class="scroll-to-top">В начало</button>
+    </a>
 
     <script>
         document.getElementById('search-input').addEventListener('input', function () {
@@ -242,16 +250,24 @@
                 post.style.display = title.includes(searchValue) ? 'flex' : 'none';
             });
         });
+        function toggleImageSize(img) {
+            img.classList.toggle('fullsize');
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            let lazyImages = document.querySelectorAll('.lazy-load');
 
-        document.querySelectorAll('.thumbnail').forEach(img => {
-            img.addEventListener('click', (e) => {
-                document.getElementById('image-modal').style.display = 'flex';
-                document.getElementById('modal-image').src = img.getAttribute('data-full-image');
+            let observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        let img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy-load');
+                        observer.unobserve(img);
+                    }
+                });
             });
-        });
 
-        document.getElementById('image-modal').addEventListener('click', () => {
-            document.getElementById('image-modal').style.display = 'none';
+            lazyImages.forEach(img => observer.observe(img));
         });
     </script>
 </body>
