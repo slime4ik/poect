@@ -23,11 +23,15 @@ SECRET_KEY = 'django-insecure-ee)ll@a&+v4tfg0l-j9$bz3_@v37+1x*@%f4%1-3+cpa*3zlkn
 LOGIN_URL = '/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ['slime4ik-poect-f407.twc1.net', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'slime4ik-poect-f407.twc1.net',
+    '188.225.75.253',
+    '127.0.0.1',
+    'localhost'
+]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://slime4ik-poect-f407.twc1.net",
-    "http://127.0.0.1:8000"
+    'https://slime4ik-poect-f407.twc1.net',
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
