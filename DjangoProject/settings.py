@@ -26,7 +26,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['slime4ik-poect-f407.twc1.net', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://slime4ik-poect-f407.twc1.net",
+    "http://slime4ik-poect-f407.twc1.net",
     "http://127.0.0.1:8000"
 ]
 
