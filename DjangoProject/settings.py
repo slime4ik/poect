@@ -24,15 +24,14 @@ LOGIN_URL = '/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 ALLOWED_HOSTS = [
-    'slime4ik-poect-f407.twc1.net',
-    '188.225.75.253',
+    'slime4ik-poect-76ae.twc1.net',
     '127.0.0.1',
     'localhost'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://slime4ik-poect-f407.twc1.net",
-    "http://slime4ik-poect-f407.twc1.net",
+    "https://slime4ik-poect-76ae.twc1.net",
+    "http://slime4ik-poect-76ae.twc1.net",
     "http://127.0.0.1:8000",
     "http://188.225.75.253"
 ]
