@@ -15,7 +15,7 @@ from waitress import serve
 from django.core.wsgi import get_wsgi_application
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pythonProject1.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DjangoProject.settings')
 
 application = get_wsgi_application()
 
