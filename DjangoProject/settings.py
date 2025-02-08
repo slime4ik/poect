@@ -34,7 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://slime4ik-poect-f407.twc1.net",
     "http://slime4ik-poect-f407.twc1.net",
     "http://127.0.0.1:8000",
-    "188.225.75.253"
+    "http://188.225.75.253"
 ]
 
 
