@@ -25,7 +25,7 @@ LOGIN_URL = '/'
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ["https://slime4ik-rep-1331.twc1.net", "http://slime4ik-rep-1331.twc1.net", "http://127.0.0.1:8000", "http://188.225.75.253"]
+CSRF_TRUSTED_ORIGINS = ["https:slime4ik-poect-b065.twc1.net", "http://slime4ik-poect-b065.twc1.net", "http://127.0.0.1:8000", "http://188.225.75.253"]
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
