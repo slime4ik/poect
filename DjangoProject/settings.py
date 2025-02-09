@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ee)ll@a&+v4tfg0l-j9$bz3_@v37+1x*@%f4%1-3+cpa*3zlkn'
 LOGIN_URL = '/'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["slime4ik-poect-b065.twc1.net"]
 
 CSRF_TRUSTED_ORIGINS = ["https:slime4ik-poect-b065.twc1.net", "http://slime4ik-poect-b065.twc1.net", "http://127.0.0.1:8000", "http://188.225.75.253"]
