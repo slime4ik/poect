@@ -142,7 +142,8 @@ USE_TZ = True
 import os
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Каталог, куда collectstatic будет собирать файлы
+STATICFILES_DIRS = []  # Должен быть пустым, иначе будет ошибка
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
