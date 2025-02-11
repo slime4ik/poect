@@ -13,12 +13,12 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
         return self.name
     class Meta:
         verbose_name = 'Темы'
         verbose_name_plural = 'АЭМ'
+
 
 @receiver(post_delete, sender=Post)
 def delete_image_on_post_delete(sender, instance, **kwargs):
@@ -110,3 +110,33 @@ def delete_image(sender, instance, **kwargs):
         # Проверяем, существует ли файл на диске, и удаляем его
         if os.path.isfile(image_path):
             os.remove(image_path)
+
+#КОМЕНТЫ ДЛЯ Post
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")  # Комментарий привязан к посту
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Пользователь, оставивший комментарий
+    text = models.TextField()  # Текст комментария
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:20]}"
+    
+#КОМЕНТЫ ДЛЯ Poste
+class Commente(models.Model):
+    post = models.ForeignKey(Poste, on_delete=models.CASCADE, related_name="commentse")  # Комментарий привязан к посту
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Пользователь, оставивший комментарий
+    text = models.TextField()  # Текст комментария
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:20]}"
+    
+#КОМЕНТЫ ДЛЯ Postw
+class Commentw(models.Model):
+    post = models.ForeignKey(Postw, on_delete=models.CASCADE, related_name="commentsw")  # Комментарий привязан к посту
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Пользователь, оставивший комментарий
+    text = models.TextField()  # Текст комментария
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
+
+    def __str__(self):
+        return f"{self.user.username}: {self.text[:20]}"

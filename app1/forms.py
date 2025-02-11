@@ -3,6 +3,7 @@ from django.shortcuts import render
 from . import models
 from .models import Post, Poste, Postw, People, News
 from django.conf import settings
+from .models import Comment, Commente, Commentw
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -139,3 +140,18 @@ class NewsForm(forms.ModelForm):
 
             })
         )
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+
+class CommenteForm(forms.ModelForm):
+    class Meta:
+        model = Commente
+        fields = ['text']
+
+class CommentwForm(forms.ModelForm):
+    class Meta:
+        model = Commentw
+        fields = ['text']

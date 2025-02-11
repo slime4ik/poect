@@ -20,7 +20,7 @@ from django.views.static import serve
 from app1 import views
 # from django.contrib import admin
 from django.urls import path
-from app1.views import index_page, a_page, create, e_page, createe, s_page, createw, signin
+from app1.views import index_page, a_page, create, e_page, createe, s_page, createw, signin, add_comment, add_commente, add_commentw
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
@@ -37,6 +37,15 @@ urlpatterns = [
     path('creates/', createw, name='createw'),
     path('', signin, name='signin'),
     path('signout/', views.signout, name='signout'),
+    path('add_comment/<int:post_id>/', add_comment, name='add_comment'),
+    path('add_commente/<int:post_id>/', add_commente, name='add_commente'),
+    path('add_commentw/<int:post_id>/', add_commentw, name='add_commentw'),
+    path('edit/<int:post_id>/', views.edit_post, name='edit_post'),
+    path('delete/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('deletee/<int:post_id>/', views.delete_poste, name='delete_poste'),
+    path('deletew/<int:post_id>/', views.delete_postw, name='delete_postw'),
+    path('edite/<int:post_id>/', views.edite_post, name='edite_post'),
+    path('editw/<int:post_id>/', views.editw_post, name='editw_post'),
     re_path(r'^a/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^e/(?P<path>.*)$', serve, {'document_root': settings.PAGE1_MEDIA_ROOT}),
     re_path(r'^s/(?P<path>.*)$', serve, {'document_root': settings.PAGE2_MEDIA_ROOT}),

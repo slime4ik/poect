@@ -1,13 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-{% load static %}
+    {% load static %}
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ title }}{% endblock %}</title>
     <style>
-        /* Динамический фон */
+        .edit-form {
+            display: none;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            border: 1px solid #444;
+            margin-top: 10px;
+        }
+
+        .edit-form input, .edit-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .edit-form button {
+            padding: 8px 12px;
+            background-color: #1e90ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .edit-form button:hover {
+            background-color: #0077cc;
+        }
+
+        .post-actions button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .post-actions button:hover {
+            background-color: #666;
+            transform: scale(1.05);
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: darkred;
+            transform: scale(1.05);
+        }
+
+        .attach-button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .attach-button input[type="file"] {
+            display: none;
+        }
+
+        .attach-button:hover {
+            background-color: #666;
+        }
+
+        .attach-button .icon {
+            margin-right: 5px;
+        }
         body {
             background: linear-gradient(135deg, #2e2e2e, #1e1e1e);
             background-size: 300% 300%;
@@ -25,7 +109,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Заголовок */
         h1 {
             margin-top: 20px;
             color: #f0f0f0;
@@ -33,7 +116,6 @@
             font-size: 1.8rem;
         }
 
-        /* Поле поиска */
         .search-container {
             text-align: center;
             margin-bottom: 20px;
@@ -51,7 +133,6 @@
             outline: none;
         }
 
-        /* Кнопки сверху */
         .top-buttons {
             text-align: center;
             margin-top: 20px;
@@ -76,7 +157,6 @@
             transform: scale(1.03);
         }
 
-        /* Посты */
         .post {
             display: flex;
             align-items: flex-start;
@@ -88,20 +168,25 @@
             width: 95%;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            position: relative; /* Для позиционирования кнопки комментариев */
         }
-
+        .title {
+            white-space: pre-wrap; /* Сохраняет переносы строк */
+            word-wrap: break-word; /* Переносит длинные слова */
+            max-width: 900px; /* Ограничивает ширину текста */
+        }
         .post img {
-            max-width: 150px;
-            max-height: 150px;
+            width: 60px;
+            height: auto;
             margin-left: 15px;
             border-radius: 5px;
-            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
             cursor: pointer;
             transition: transform 0.2s ease;
         }
+        
 
         .post img:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
         .post-content {
@@ -109,7 +194,6 @@
             text-align: left;
         }
 
-        /* Новый стиль для поста */
         .post-header {
             display: flex;
             justify-content: space-between;
@@ -148,8 +232,35 @@
             color: #ccc;
         }
 
-        /* Модальное окно */
-        #image-modal {
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #444, #222);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s, transform 0.2s, opacity 0.3s;
+            opacity: 0.7;
+        }
+
+        .scroll-to-top:hover {
+            background: linear-gradient(135deg, #666, #444);
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .scroll-to-top:active {
+            transform: scale(1);
+        }
+
+        /* Стили для большого изображения */
+        .full-image {
             display: none;
             position: fixed;
             top: 0;
@@ -162,38 +273,11 @@
             z-index: 1000;
         }
 
-        #image-modal img {
+        .full-image img {
             max-width: 90%;
             max-height: 90%;
             border-radius: 5px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
         }
-        .scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #444, #222);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s, transform 0.2s, opacity 0.3s;
-    opacity: 0.7;
-}
-
-.scroll-to-top:hover {
-    background: linear-gradient(135deg, #666, #444);
-    transform: scale(1.1);
-    opacity: 1;
-}
-
-.scroll-to-top:active {
-    transform: scale(1);
-}
         .post img {
             width: 150px;
             height: auto;
@@ -208,7 +292,190 @@
             max-width: 90vw;
             max-height: 90vh;
             transform: scale(1);
-        }  
+        }
+
+        /* Стили для комментариев */
+        .comments-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+            border: 1px solid #444;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            display: none; /* Скрываем по умолчанию */
+        }
+
+        .comments-section h3 {
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .comments-section ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .comments-section li {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .comments-section li strong {
+            color: #1e90ff;
+            font-weight: bold;
+        }
+
+        .comments-section li .timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .comments-section form {
+            margin-top: 15px;
+        }
+
+        .comments-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            background-color: #222;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s;
+        }
+
+        .comments-section textarea:focus {
+            border-color: #1e90ff;
+        }
+
+        .comments-section button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #1e90ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .comments-section button:hover {
+            background-color: #0077cc;
+            transform: scale(1.05);
+        }
+
+        .comments-section button:active {
+            transform: scale(1);
+        }
+
+        /* Кнопка комментариев в левом нижнем углу */
+        .toggle-comments {
+            margin-top: 10px; /* Отступ сверху */
+            padding: 8px 12px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .toggle-comments:hover {
+            background-color: #666;
+            transform: scale(1.05);
+        }
+
+        .toggle-comments:active {
+            transform: scale(1);
+        }
+
+        /* Адаптивные стили для мобильных устройств */
+        @media (max-width: 768px) {
+            .post {
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+            }
+            .title {
+                white-space: pre-wrap; /* Сохраняет переносы строк */
+                word-wrap: break-word; /* Переносит длинные слова */
+                max-width: 300px; /* Ограничивает ширину текста */
+            }
+            .post img {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100px;
+            }
+
+            .post-content {
+                width: 100%;
+            }
+
+            .comments-section {
+                padding: 10px;
+            }
+
+            .comments-section li {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+
+            .comments-section textarea {
+                min-height: 60px;
+                font-size: 0.8rem;
+            }
+
+            .comments-section button {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .content {
+                white-space: pre-wrap; /* Сохраняет переносы строк */
+                word-wrap: break-word; /* Переносит длинные слова */
+                max-width: 500px; /* Ограничивает ширину текста */
+            }
+            .toggle-comments {
+                position: static;
+                margin-top: 10px;
+                width: 100%;
+                text-align: center;
+            }
+                .post img + .toggle-comments {
+        order: 1;
+    }
+    .edit-form textarea {
+        width: 100%;
+        min-height: 150px;
+    }
+        }
+        .prev{
+            width: 300
+        }
+        .edit-form textarea {
+            width: 80%;
+            min-height: 200px;
+            resize: vertical;
+        }
     </style>
 </head>
 <body>
@@ -236,21 +503,83 @@
             </div>
             <div class="content">{{ el.text|linebreaksbr|urlize }}</div>
         </div>
+    
         {% if el.image %}
             <img src="{{ el.image.url }}" alt="Post Image" class="thumbnail" onclick="toggleImageSize(this)">
-            {% endif %}
-        </div>
+        {% endif %}
+    
+        {% if el.user == user %}
+            <div class="post-actions">
+                <button onclick="showEditForm({{ el.id }})">Редактировать</button>
+                <a href="{% url 'delete_postw' el.id %}" class="post-action" onclick="return confirm('Вы уверены, что хотите удалить этот пост?')">
+                    <button class="delete-button">
+                        <i class="icon">🗑️</i> Удалить
+                    </button>
+                </a>
+            </div>
+            
+            <!-- Форма редактирования -->
+            <div class="edit-form" id="edit-form-{{ el.id }}" style="display:none;">
+                <form method="post" enctype="multipart/form-data" action="{% url 'editw_post' el.id %}">
+                    {% csrf_token %}
+                    <div>
+                        <label for="name">Название:</label>
+                        <input maxlength="100" type="text" name="name" value="{{ el.name }}" required>
+                    </div>
+                    <div>
+                        <label for="text">Текст:</label>
+                        <textarea maxlength="9998" name="text" required>{{ el.text }}</textarea>
+                    </div>
+                    <div>
+                        <label for="image">Изображение:</label>
+                        <button type="button" class="attach-button" onclick="document.getElementById('file-input-{{ el.id }}').click();">
+                            <span class="icon">📎</span> Прикрепить
+                        </button>
+                        <div id="image-preview-{{ el.id }}"></div>
+                        <input type="file" name="image" id="file-input-{{ el.id }}" style="display:none;" 
+                               accept="image/*" onchange="previewImage(event, '{{ el.id }}')">
+                        {% if el.image %}
+                            <div id="image-preview-{{ el.id }}" class="prev" width="300">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit">Сохранить изменения</button>
+                    <button type="button" onclick="hideEditForm({{ el.id }})">Отмена</button>
+                </form>
+            </div>
+        {% endif %}
+    
+        <!-- Блок комментариев -->
+       
+    </div>
     {% endfor %}
+    
     {% include "pagination.html" with page=Postws %}
     {% endblock %}
 
-    <div id="image-modal">
-        <img id="modal-image" src="" alt="Full Image">
-    </div>
-<a href="javascript:scroll(0,0)">
-    <button class="scroll-to-top">В начало</button>
-</a>
+    <a href="javascript:scroll(0,0)">
+        <button class="scroll-to-top">В начало</button>
+    </a>
     <script>
+
+        function previewImage(event, id) {
+            const file = event.target.files[0];
+            if (!file) return;
+        
+            // Проверяем, является ли файл изображением
+            if (!file.type.startsWith('image/')) {
+                alert("Можно загружать только изображения!");
+                event.target.value = ""; // Очищаем input
+                return;
+            }
+        
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById("image-preview-" + id);
+                preview.innerHTML = `<img src="${e.target.result}" alt="Предпросмотр" style="max-width: 200px; max-height: 200px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
         document.getElementById('search-input').addEventListener('input', function () {
             let searchValue = this.value.toLowerCase();
             document.querySelectorAll('.post').forEach(post => {
@@ -258,10 +587,89 @@
                 post.style.display = title.includes(searchValue) ? 'flex' : 'none';
             });
         });
+
         function toggleImageSize(img) {
             img.classList.toggle('fullsize');
         }
 
+        function toggleComments(postId) {
+            const commentsSection = document.querySelector(`#comments-${postId}`);
+            const button = document.querySelector(`#coms-${postId}`);
+        
+            if (commentsSection && button) {
+                // Получаем количество комментариев из атрибута data-comment-count
+                const commentCount = button.getAttribute('data-comment-count');
+        
+                // Переключаем видимость блока комментариев
+                if (commentsSection.style.display === 'none' || commentsSection.style.display === '') {
+                    commentsSection.style.display = 'block';
+                    button.textContent = `Скрыть (${commentCount})`;
+                } else {
+                    commentsSection.style.display = 'none';
+                    button.textContent = `Комментарии (${commentCount})`;
+                }
+            }
+        }
+        function showEditForm(postId) {
+            document.getElementById('edit-form-' + postId).style.display = 'block';
+        }
+        
+        function hideEditForm(postId) {
+            document.getElementById('edit-form-' + postId).style.display = 'none';
+        }
+            function splitTextEvery140Chars(text) {
+    const chunkSize = 140; // Количество символов в строке
+    const chunks = []; // Массив для хранения строк
+
+    for (let i = 0; i < text.length; i += chunkSize) {
+        // Разбиваем текст на части по 140 символов
+        chunks.push(text.slice(i, i + chunkSize));
+    }
+
+    // Объединяем части с символом новой строки
+    return chunks.join('\n');
+}
+
+// Применяем функцию ко всем постам
+document.querySelectorAll('.post').forEach(post => {
+    // Обработка названия
+    const titleElement = post.querySelector('.title');
+    if (titleElement) {
+        const originalTitle = titleElement.textContent; // Получаем исходный текст названия
+        const formattedTitle = splitTextEvery140Chars(originalTitle); // Разбиваем текст
+        titleElement.textContent = formattedTitle; // Вставляем обратно
+    }
+
+    // Обработка содержимого
+    const contentElement = post.querySelector('.content');
+    if (contentElement) {
+        const originalText = contentElement.textContent; // Получаем исходный текст
+        const formattedText = splitTextEvery120Chars(originalText); // Разбиваем текст
+        contentElement.textContent = formattedText; // Вставляем обратно
+    }
+});
+        function splitTextEvery120Chars(text) {
+            const chunkSize = 120; // Количество символов в строке
+            const chunks = []; // Массив для хранения строк
+        
+            for (let i = 0; i < text.length; i += chunkSize) {
+                // Разбиваем текст на части по 140 символов
+                chunks.push(text.slice(i, i + chunkSize));
+            }
+        
+            // Объединяем части с символом новой строки
+            return chunks.join('\n');
+        }
+        
+        // Применяем функцию ко всем постам
+        document.querySelectorAll('.post').forEach(post => {
+            const contentElement = post.querySelector('.content');
+            if (contentElement) {
+                const originalText = contentElement.textContent; // Получаем исходный текст
+                const formattedText = splitTextEvery120Chars(originalText); // Разбиваем текст
+                contentElement.textContent = formattedText; // Вставляем обратно
+            }
+        });
     </script>
 </body>
 </html>

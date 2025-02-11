@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
-from .models import Post, Poste, Postw, People, News
-from .forms import PosteForm, PostForm, PostwForm, PeopleForm
+from .models import Post, Poste, Postw, People, News, Commentw, Commente, Comment
+from .forms import PosteForm, PostForm, PostwForm, PeopleForm, CommentForm, CommenteForm, CommentwForm
 from .forms import AccessKeyForm
 from django.conf import settings
 from django.urls import reverse
@@ -20,7 +20,7 @@ def index_page(request):
 @login_required
 def a_page(request):
     posts = Post.objects.order_by('-id')  # Получаем QuerySet с записями
-    paginator = Paginator(posts, 15)  # Передаем QuerySet в Paginator
+    paginator = Paginator(posts, 7)  # Передаем QuerySet в Paginator
     page_number = request.GET.get('page', 1)
     try:
         posts = paginator.page(page_number)
@@ -72,7 +72,7 @@ def create(request):
 # app1/views.py
 def e_page(request):
     postes = Poste.objects.order_by('-id')
-    paginator = Paginator(postes, 15)  # Передаем QuerySet в Paginator
+    paginator = Paginator(postes, 7)  # Передаем QuerySet в Paginator
     page_number = request.GET.get('page', 1)
     try:
         postes = paginator.page(page_number)
@@ -110,7 +110,7 @@ def createe(request):
 @login_required
 def s_page(request):
     postws = Postw.objects.order_by('-id')
-    paginator = Paginator(postws, 15)  # Передаем QuerySet в Paginator
+    paginator = Paginator(postws, 7)  # Передаем QuerySet в Paginator
     page_number = request.GET.get('page', 1)
     try:
         postws = paginator.page(page_number)
@@ -173,6 +173,127 @@ def signout(request):
     messages.success(request, "Вышли успешно)")
     return redirect('signin')
 
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    if request.method == "POST":
+        text = request.POST.get("text")
+        if text:
+            Comment.objects.create(post=post, user=request.user, text=text)
+    
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
+@login_required
+def add_commente(request, post_id):
+    post = get_object_or_404(Poste, id=post_id)
+    
+    if request.method == "POST":
+        text = request.POST.get("text")
+        if text:
+            Commente.objects.create(post=post, user=request.user, text=text)
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
+@login_required
+def add_commentw(request, post_id):
+    post = get_object_or_404(Postw, id=post_id)
+    
+    if request.method == "POST":
+        text = request.POST.get("text")
+        if text:
+            Commentw.objects.create(post=post, user=request.user, text=text)
+    
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+#ДЛЯ АЭМ 
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/a/')  # Если это не автор, перенаправляем на главную
+
+    if request.method == 'POST':
+        post.name = request.POST['name']  # Обновляем название
+        post.text = request.POST['text']  # Обновляем текст
+
+        # Обрабатываем изображение, если оно было загружено
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+
+        post.save()
+        return redirect('/a/')  # Перенаправление на главную страницу
+
+    return render(request, 'a.html', {'Posts': Post.objects.all()})
+
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/a/')  # Если это не автор, перенаправляем на главную
+
+    post.delete()
+    return redirect('/a/')  # Или перенаправить на страницу с постами
+
+#ДЛЯ ЭОВС
+def edite_post(request, post_id):
+    post = get_object_or_404(Poste, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/e/')  # Если это не автор, перенаправляем на главную
+
+    if request.method == 'POST':
+        post.name = request.POST['name']  # Обновляем название
+        post.text = request.POST['text']  # Обновляем текст
+
+        # Обрабатываем изображение, если оно было загружено
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+
+        post.save()
+        return redirect('/e/')  # Перенаправление на главную страницу
+
+    return render(request, 'e.html', {'Postes': Post.objects.all()})
+
+#ДЛЯ СЭВС
+def editw_post(request, post_id):
+    post = get_object_or_404(Postw, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/s/')  # Если это не автор, перенаправляем на главную
+
+    if request.method == 'POST':
+        post.name = request.POST['name']  # Обновляем название
+        post.text = request.POST['text']  # Обновляем текст
+
+        # Обрабатываем изображение, если оно было загружено
+        if 'image' in request.FILES:
+            post.image = request.FILES['image']
+
+        post.save()
+        return redirect('/s/')  # Перенаправление на главную страницу
+
+    return render(request, 's.html', {'Postws': Post.objects.all()})
+
+def delete_poste(request, post_id):
+    post = get_object_or_404(Poste, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/e/')  # Если это не автор, перенаправляем на главную
+
+    post.delete()
+    return redirect('/e/')  # Или перенаправить на страницу с постами
+
+def delete_postw(request, post_id):
+    post = get_object_or_404(Postw, id=post_id)
+
+    # Проверяем, что текущий пользователь — автор поста
+    if post.user != request.user:
+        return redirect('/s/')  # Если это не автор, перенаправляем на главную
+
+    post.delete()
+    return redirect('/s/')  # Или перенаправить на страницу с постами
 
