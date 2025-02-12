@@ -36,9 +36,12 @@ def a_page(request):
 @login_required
 def create(request):
     error = ''
+    image_url = None
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
+            image_url = 'images/load.gif'
+            messages.success(request, 'Пост добавляется давай жди емае')
             # Создаем объект поста без сохранения в БД
             post = form.save(commit=False)
             post.user = request.user  # Присваиваем текущего пользователя
@@ -55,7 +58,8 @@ def create(request):
     context = {
         'form': form,
         'error': error,
-        'posts': posts  # Добавляем посты в контекст для отображения
+        'posts': posts,  # Добавляем посты в контекст для отображения
+        'image_url' : image_url
     }
     return render(request, 'create.html', context)
 
@@ -87,9 +91,12 @@ def e_page(request):
 @login_required
 def createe(request):
     error=''
+    image_url = None
     if request.method == 'POST':
         form = PosteForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
+            image_url = 'images/load.gif'
+            messages.success(request, 'Пост добавляется давай жди емае')
             post = form.save(commit=False)
             post.user = request.user  # Присваиваем текущего пользователя
             post.save()  # Сохраняем пост в БД
@@ -103,7 +110,8 @@ def createe(request):
 
     context ={
         'form': form,
-        'error': error
+        'error': error,
+        'image_url' : image_url
     }
     return render(request, 'createe.html', context)
 
@@ -124,9 +132,12 @@ def s_page(request):
 @login_required
 def createw(request):
     error=''
+    image_url = None
     if request.method == 'POST':
         form = PostwForm(request.POST, request.FILES)  # Обработка данных формы и файлов
         if form.is_valid():
+            image_url = 'images/load.gif'
+            messages.success(request, 'Пост добавляется давай жди емае')
             post = form.save(commit=False)
             post.user = request.user  # Присваиваем текущего пользователя
             post.save()  # Сохраняем пост в БД
@@ -141,7 +152,8 @@ def createw(request):
 
     context ={
         'form': form,
-        'error': error
+        'error': error,
+        'image_url' : image_url
     }
     return render(request, 'creates.html', context)
 

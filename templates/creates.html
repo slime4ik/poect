@@ -166,11 +166,26 @@
                 height: 200px; /* Увеличиваем высоту поля для мобильных устройств */
             }
         }
+        .image-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     {% block content %}
     <div class="form-container">
+        {% if image_url %}
+        <div class="image-container">
+            <img src="{% static image_url %}" alt="Uploaded Image">
+        </div>
+        {% endif %}
         <font>Твой будущий постик</font>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
