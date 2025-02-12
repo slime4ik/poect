@@ -181,11 +181,13 @@
 <body>
     {% block content %}
     <div class="form-container">
-        {% if image_url %}
-        <div class="image-container">
-            <img src="{% static image_url %}" alt="Uploaded Image">
+        <div id="loadingGif" style="display: none; margin-top: 20px;" class='image-container'>
+            <img src="{% static 'images/load.gif' %}" alt="Loading...">
         </div>
-        {% endif %}
+        <div id="loadingMessage" style="display: none; margin-top: 20px;">
+            <font style="color: #f0f0f0;">Отправка поста, давай жди емае...</font>
+        </div>
+
         <font>Твой будущий постик</font>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -202,7 +204,7 @@
                 <div class="file-warning" id="fileWarning">Можно прикреплять только изображения и гифки!</div>
             </div>
 
-            <button type="submit">Запостить</button>
+            <button type="submit" id="submitButton">Запостить</button>
         </form>
 
         <div class="buttons-container">
@@ -212,6 +214,24 @@
     {% endblock %}
 
     <script>
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+            event.preventDefault();  // Предотвращаем стандартную отправку формы
+        
+            // Показываем гифку и сообщение
+            const loadingGif = document.getElementById('loadingGif');
+            const message = document.getElementById('loadingMessage');  // Добавим элемент для сообщения
+        
+            if (loadingGif) {
+                loadingGif.style.display = 'block';  // Показываем гифку
+            }
+            if (message) {
+                message.style.display = 'block';  // Показываем сообщение
+            }
+        
+            // Отправляем форму сразу после отображения
+            document.querySelector('form').submit();
+        });
+        
         // Проверка на превышение лимита текста
         const textarea = document.querySelector('textarea[name="text"]');
         const warningMessage = document.getElementById('warningMessage');
