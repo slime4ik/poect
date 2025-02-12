@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 {% load static %}
@@ -173,8 +173,57 @@
         }
 
         .image-container img {
-            max-width: 100%;
+            max-width: 150px; /* Фиксированная ширина */
+            max-height: 150px; /* Фиксированная высота */
+            width: auto;
             height: auto;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            object-fit: cover; /* Чтобы изображение не искажалось */
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Модальное окно для увеличенного изображения */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -204,6 +253,11 @@
                 <div class="file-warning" id="fileWarning">Можно прикреплять только изображения и гифки!</div>
             </div>
 
+            <!-- Контейнер для отображения прикрепленного изображения -->
+            <div class="image-container" id="imagePreviewContainer" style="display: none;">
+                <img id="imagePreview" src="#" alt="Preview" />
+            </div>
+
             <button type="submit" id="submitButton">Запостить</button>
         </form>
 
@@ -211,25 +265,41 @@
             <a href="/a/" id="posts-button">Перейти к постам</a>
         </div>
     </div>
+
+    <!-- Модальное окно для увеличенного изображения -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
     {% endblock %}
 
     <script>
         document.getElementById('submitButton').addEventListener('click', function(event) {
             event.preventDefault();  // Предотвращаем стандартную отправку формы
         
-            // Показываем гифку и сообщение
-            const loadingGif = document.getElementById('loadingGif');
-            const message = document.getElementById('loadingMessage');  // Добавим элемент для сообщения
+            const form = document.querySelector('form');
         
-            if (loadingGif) {
-                loadingGif.style.display = 'block';  // Показываем гифку
-            }
-            if (message) {
-                message.style.display = 'block';  // Показываем сообщение
-            }
+            // Проверяем валидность формы
+            if (form.checkValidity()) {
+                // Показываем гифку и сообщение
+                const loadingGif = document.getElementById('loadingGif');
+                const message = document.getElementById('loadingMessage');  // Добавляем элемент для сообщения
         
-            // Отправляем форму сразу после отображения
-            document.querySelector('form').submit();
+                if (loadingGif) {
+                    loadingGif.style.display = 'block';  // Показываем гифку
+                }
+                if (message) {
+                    message.style.display = 'block';  // Показываем сообщение
+                }
+        
+                // Отправляем форму после небольшой задержки
+                setTimeout(() => {
+                    form.submit();
+                }, 10);  // 10 миллисекунд для отображения
+            } else {
+                // Если форма не валидна, покажем сообщение об ошибке
+                alert("Пожалуйста, заполните все обязательные поля.");
+            }
         });
         
         // Проверка на превышение лимита текста
@@ -256,7 +326,32 @@
                 fileInput.value = '';  // Очистить файл
             } else {
                 fileWarning.style.display = 'none';
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                        const imagePreview = document.getElementById('imagePreview');
+                        imagePreview.src = e.target.result;
+                        imagePreviewContainer.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
             }
+        });
+
+        // Модальное окно для увеличенного изображения
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imagePreview.addEventListener('click', function() {
+            modal.style.display = 'block';
+            modalImg.src = this.src;
+        });
+
+        const span = document.getElementsByClassName('close')[0];
+        span.addEventListener('click', function() {
+            modal.style.display = 'none';
         });
     </script>
 </body>
